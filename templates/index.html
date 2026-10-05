@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}AI Research Paper Generator & Citation Engine{% endblock %}
+
+{% block content %}
+<section class="mb-6">
+    <div class="relative overflow-hidden rounded-2xl sketch-card p-6">
+        <h1 class="text-2xl sm:text-3xl font-bold">Monochrome workspace</h1>
+        <p class="mt-2">Generate research papers and citations with a clean black & white interface.</p>
+        <div class="mt-4 flex flex-wrap gap-2">
+            <span class="px-3 py-1 rounded-full sketch-chip">Powered by Gemini</span>
+            <span class="px-3 py-1 rounded-full sketch-chip">Pandoc export</span>
+            <span class="px-3 py-1 rounded-full sketch-chip">Login secured</span>
+        </div>
+        <button id="start-writing-btn" class="mt-5 inline-flex items-center sketch-btn px-4 py-2 rounded-lg">Start Writing</button>
+    </div>
+</section>
+
+<div id="message-box" class="hidden p-4 mb-4 text-sm rounded-lg" role="alert"></div>
+
+<div class="rounded-xl">
+    <div class="rounded-xl sketch-card">
+    <div class="border-b border-gray-200 dark:border-gray-700">
+        <nav class="-mb-px flex space-x-6 px-6" aria-label="Tabs">
+            <button id="tab-generate" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-black dark:text-white">
+                Generate Paper
+            </button>
+            <button id="tab-find" class="tab-btn border-transparent text-black hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm dark:text-white dark:hover:text-gray-100 dark:hover:border-gray-500">
+                Find Related Papers
+            </button>
+            <button id="tab-cite" class="tab-btn border-transparent text-black hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm dark:text-white dark:hover:text-gray-100 dark:hover:border-gray-500">
+                Generate Citation
+            </button>
+        </nav>
+        <div id="progress-bar" class="h-1 sketch-progress w-0 transition-all"></div>
+    </div>
+
+    <div class="p-6">
+        <div id="panel-generate" class="tab-panel">
+            <div class="mb-4">
+                <input type="text" id="topic-input" placeholder="e.g., photosynthesis, quantum computing..." class="w-full p-3 rounded-lg sketch-input">
+            </div>
+            <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                <div id="topic-char-count">0 characters</div>
+                <div id="example-topics" class="space-x-2">
+                    <button class="px-2 py-1 rounded-full sketch-chip">AI in healthcare</button>
+                    <button class="px-2 py-1 rounded-full sketch-chip">Renewable energy storage</button>
+                    <button class="px-2 py-1 rounded-full sketch-chip">CRISPR gene editing</button>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-6 items-end">
+                <div class="flex-grow"><label for="language-select" class="block text-sm font-medium text-gray-700 mb-1">Language:</label><select id="language-select" class="w-full p-3 border border-gray-300 rounded-lg bg-white"><option value="English">English</option><option value="Spanish">Spanish</option><option value="French">French</option></select></div>
+                <button id="generate-paper-btn" class="w-full sm:w-auto sketch-btn p-3 rounded-lg font-semibold flex items-center justify-center min-w-[160px]"><svg id="paper-spinner" class="animate-spin -ml-1 mr-3 h-5 w-5 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span id="paper-button-text">Generate Paper</span></button>
+            </div>
+            <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 mb-3 items-center">
+                <div class="flex-grow w-full sm:w-auto"><label for="download-format-select" class="block text-sm font-medium text-gray-700 mb-1">Download Format:</label><select id="download-format-select" class="w-full p-3 border border-gray-300 rounded-lg bg-white"><option value="PDF">PDF</option><option value="DOCX">DOCX</option><option value="Markdown">Markdown</option><option value="TXT">TXT</option></select></div>
+                <button id="download-btn" class="w-full sm:w-auto sketch-btn p-3 rounded-lg font-semibold">Download</button>
+                <button id="copy-paper-btn" class="w-full sm:w-auto sketch-btn p-3 rounded-lg font-semibold">Copy</button>
+                <button id="clear-paper-btn" class="w-full sm:w-auto sketch-btn p-3 rounded-lg font-semibold">Clear</button>
+                <button id="toggle-preview-btn" class="w-full sm:w-auto sketch-btn p-3 rounded-lg font-semibold">Preview</button>
+            </div>
+            <textarea id="paper-output" class="w-full p-4 border border-gray-300 bg-gray-50 rounded-lg dark:bg-gray-900 dark:border-gray-700" placeholder="Your generated research paper will appear here..." readonly style="min-height: 250px; white-space: pre-wrap;"></textarea>
+            <div id="paper-preview" class="w-full p-4 border border-gray-300 bg-white rounded-lg hidden preview-content dark:bg-gray-900 dark:border-gray-700"></div>
+            <div class="mt-4">
+                <div class="text-sm text-gray-600 mb-2">Recent topics</div>
+                <div id="recent-topics" class="flex flex-wrap gap-2"></div>
+            </div>
+        </div>
+
+        <div id="panel-find" class="tab-panel hidden">
+            <div class="mb-4"><input type="text" id="papers-topic-input" placeholder="Enter a research topic (e.g., AI in healthcare)" class="w-full p-3 border border-gray-300 rounded-lg"></div>
+            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-6 items-end">
+                <div class="flex-grow"><label for="find-papers-style" class="block text-sm font-medium text-gray-700 mb-1">Citation Style:</label><select id="find-papers-style" class="w-full p-3 border border-gray-300 rounded-lg bg-white"><option value="APA">APA</option><option value="MLA">MLA</option><option value="Chicago">Chicago</option><option value="IEEE">IEEE</option></select></div>
+                <button id="find-papers-btn" class="w-full sm:w-auto bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700">Find Papers</button>
+            </div>
+            <textarea id="papers-output" class="w-full p-4 border border-gray-300 bg-gray-50 rounded-lg" placeholder="A bibliography of related papers will appear here..." readonly style="min-height: 200px; white-space: pre-wrap;"></textarea>
+        </div>
+
+        <div id="panel-cite" class="tab-panel hidden">
+            <div class="mb-4"><input type="text" id="citation-source-input" placeholder="Enter a URL, book title, or source details..." class="w-full p-3 border border-gray-300 rounded-lg"></div>
+            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-6 items-end">
+                <div class="flex-grow"><label for="citation-engine-style" class="block text-sm font-medium text-gray-700 mb-1">Citation Style:</label><select id="citation-engine-style" class="w-full p-3 border border-gray-300 rounded-lg bg-white"><option value="APA">APA</option><option value="MLA">MLA</option><option value="Chicago">Chicago</option><option value="IEEE">IEEE</option></select></div>
+                <button id="generate-citation-btn" class="w-full sm:w-auto bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700">Generate Citation</button>
+            </div>
+            <textarea id="citation-output" class="w-full p-4 border border-gray-300 bg-gray-50 rounded-lg" placeholder="Your formatted citation will appear here..." readonly style="min-height: 100px; white-space: pre-wrap;"></textarea>
+        </div>
+    </div>
+</div>
+</div>
+
+<div id="chat-widget-container" class="fixed bottom-5 right-5 z-50">
+    <button id="chat-bubble" aria-label="Open chat assistant" class="sketch-btn rounded-full p-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg></button>
+    <div id="chat-window" class="hidden absolute bottom-20 right-0 w-80 bg-white rounded-lg shadow-2xl border flex flex-col" style="height: 400px;">
+        <div class="bg-blue-600 text-white p-3 rounded-t-lg font-semibold">AI Assistant</div>
+        <div id="chat-messages" class="flex-grow p-3 overflow-y-auto"></div>
+        <div class="p-3 border-t"><div class="flex"><input type="text" id="chat-input" placeholder="Ask something..." class="flex-grow p-2 border rounded-l-md"><button id="chat-send-btn" class="bg-blue-600 text-white p-2 rounded-r-md hover:bg-blue-700">Send</button></div></div>
+    </div>
+</div>
+{% endblock %}
