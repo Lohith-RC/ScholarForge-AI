@@ -1,4 +1,4 @@
-# 🎓 ScholarForge AI 2.0 — Autonomous Academic Research Studio
+# 🎓 ScholarForge — Autonomous Academic Research Studio
 
 [![Python Version](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/framework-Flask%203.x-lightgrey.svg)](https://flask.palletsprojects.com/)

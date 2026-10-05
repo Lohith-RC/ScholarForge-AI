@@ -1,46 +1,51 @@
 {% extends "base.html" %}
 
-{% block title %}Create Account &mdash; ScholarForge AI{% endblock %}
+{% block title %}Create Profile &mdash; ScholarForge{% endblock %}
 
 {% block content %}
-<div class="max-w-md mx-auto my-8">
-    <div class="text-center mb-6">
-        <div class="w-12 h-12 rounded-2xl bg-slate-900 dark:bg-sky-400 text-white dark:text-slate-900 mx-auto flex items-center justify-center font-extrabold text-2xl shadow mb-3">
-            <i class="fa-solid fa-graduation-cap"></i>
+<div class="max-w-md mx-auto my-12">
+    <div class="text-center mb-8">
+        <div class="w-12 h-12 rounded-2xl bg-slate-900 dark:bg-sky-400 text-white dark:text-slate-900 mx-auto flex items-center justify-center font-extrabold text-2xl shadow-md mb-4">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+                <path d="M6 6h10"/>
+                <path d="M6 10h10"/>
+                <path d="m9 14 2 2 4-4"/>
+            </svg>
         </div>
         <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Create Workspace</h1>
-        <p class="text-slate-600 dark:text-slate-400 text-sm mt-1">Start synthesizing grounded academic research today</p>
+        <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Start synthesizing grounded academic research</p>
     </div>
 
-    <div class="sketch-card rounded-2xl p-8 bg-white dark:bg-slate-900">
+    <div class="academic-card rounded-2xl p-8 bg-white dark:bg-slate-900 shadow-md">
         <form method="POST" action="{{ url_for('register') }}" class="space-y-5">
             <div>
                 <label for="username" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">Choose Username</label>
                 <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-user-plus"></i></span>
-                    <input type="text" id="username" name="username" required placeholder="e.g. scholar_smith"
-                           class="w-full pl-10 pr-3 py-3 rounded-xl sketch-input text-sm">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400"><i class="fa-solid fa-user-plus"></i></span>
+                    <input type="text" id="username" name="username" required placeholder="scholar_curie"
+                           class="w-full pl-10 pr-4 py-3 rounded-xl academic-input text-sm">
                 </div>
             </div>
 
             <div>
                 <label for="password" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">Create Secure Password</label>
                 <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-key"></i></span>
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400"><i class="fa-solid fa-key"></i></span>
                     <input type="password" id="password" name="password" required placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                           class="w-full pl-10 pr-3 py-3 rounded-xl sketch-input text-sm">
+                           class="w-full pl-10 pr-4 py-3 rounded-xl academic-input text-sm">
                 </div>
             </div>
 
-            <button type="submit" class="w-full sketch-btn-primary p-3 rounded-xl font-bold text-sm flex items-center justify-center space-x-2">
-                <span>Register & Create Workspace</span>
-                <i class="fa-solid fa-user-check"></i>
+            <button type="submit" class="w-full btn-primary p-3 rounded-xl font-bold text-sm flex items-center justify-center space-x-2 shadow-sm">
+                <span>Create Academic Account</span>
+                <i class="fa-solid fa-check"></i>
             </button>
         </form>
 
         <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800 text-center text-xs text-slate-500">
-            Already have an academic account? 
-            <a href="{{ url_for('login') }}" class="font-bold text-sky-600 dark:text-sky-400 hover:underline">Log in here</a>
+            Already have an academic profile? 
+            <a href="{{ url_for('login') }}" class="font-bold text-sky-600 dark:text-sky-400 hover:underline">Sign in</a>
         </div>
     </div>
 </div>

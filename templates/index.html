@@ -1,52 +1,55 @@
 {% extends "base.html" %}
 
-{% block title %}ScholarForge AI &mdash; Autonomous Academic Research Studio{% endblock %}
+{% block title %}ScholarForge &mdash; Academic Research Workstation{% endblock %}
 
 {% block content %}
-<!-- Top Studio Hero Banner -->
+<!-- Studio Hero Section -->
 <section class="mb-8">
-    <div class="sketch-card rounded-2xl p-6 sm:p-8 bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-950">
+    <div class="academic-card rounded-2xl p-6 sm:p-8 bg-white dark:bg-slate-900">
         <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-            <div>
-                <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300 border border-sky-300 dark:border-sky-800 mb-3">
-                    <i class="fa-solid fa-microchip"></i>
-                    <span>Next-Gen Academic Synthesis Engine</span>
+            <div class="max-w-3xl">
+                <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 mb-3">
+                    <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                    <span>Autonomous Academic Research Workspace</span>
                 </div>
-                <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                    Scholarly Manuscript & Citation Studio
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+                    Author, Ground & Publish Scholarly Manuscripts
                 </h1>
-                <p class="mt-2 text-base text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
-                    Author publication-grade academic papers, discover verified peer-reviewed literature across 250M+ OpenAlex works, format standard citations, and compile to PDF and DOCX.
+                <p class="mt-3 text-base text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
+                    Generate peer-reviewed academic papers grounded in 250M+ verified scientific publications from OpenAlex and CrossRef. Formatted with standard mathematical formulas, live citations, and multi-format document exports.
                 </p>
+                
+                <!-- Feature Micro-Badges -->
                 <div class="mt-4 flex flex-wrap gap-2 text-xs font-semibold">
-                    <span class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 flex items-center shadow-sm">
-                        <i class="fa-solid fa-atom text-sky-500 mr-1.5"></i> Real-Time SSE Streaming
+                    <span class="px-3 py-1 rounded-md bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex items-center shadow-xs">
+                        <i class="fa-solid fa-bolt text-sky-500 mr-1.5"></i> Live SSE Streaming
                     </span>
-                    <span class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 flex items-center shadow-sm">
-                        <i class="fa-solid fa-file-pdf text-rose-500 mr-1.5"></i> Native PDF & DOCX Export
+                    <span class="px-3 py-1 rounded-md bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex items-center shadow-xs">
+                        <i class="fa-solid fa-file-pdf text-rose-500 mr-1.5"></i> Native PDF & Word Export
                     </span>
-                    <span class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 flex items-center shadow-sm">
-                        <i class="fa-solid fa-check-double text-emerald-500 mr-1.5"></i> Verified DOIs
+                    <span class="px-3 py-1 rounded-md bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex items-center shadow-xs">
+                        <i class="fa-solid fa-square-root-variable text-amber-500 mr-1.5"></i> KaTeX Mathematical Equations
                     </span>
                 </div>
             </div>
 
+            <!-- Header Quick Actions -->
             <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-                <button id="quick-start-btn" class="sketch-btn-primary px-5 py-3 rounded-xl font-bold flex items-center justify-center space-x-2 text-sm">
+                <button id="quick-start-btn" class="btn-primary px-5 py-3 rounded-xl font-bold flex items-center justify-center space-x-2 text-sm shadow-sm">
                     <i class="fa-solid fa-pen-nib"></i>
-                    <span>Start Writing Paper</span>
+                    <span>Start Writing</span>
                 </button>
-                <button id="search-tab-trigger-btn" class="sketch-btn px-5 py-3 rounded-xl font-bold flex items-center justify-center space-x-2 text-sm">
+                <button id="search-tab-trigger-btn" class="btn-secondary px-5 py-3 rounded-xl font-bold flex items-center justify-center space-x-2 text-sm shadow-sm">
                     <i class="fa-solid fa-magnifying-glass text-sky-500"></i>
-                    <span>Explore Verified Papers</span>
+                    <span>Search Literature</span>
                 </button>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Studio Notification Bar -->
-<div id="status-toast" class="hidden p-4 mb-6 rounded-xl text-sm font-semibold sketch-card flex items-center justify-between" role="alert">
+<!-- Studio Toast Notification Banner -->
+<div id="status-toast" class="hidden p-4 mb-6 rounded-xl text-sm font-semibold academic-card flex items-center justify-between transition-all" role="alert">
     <div class="flex items-center space-x-3">
         <i id="toast-icon" class="fa-solid fa-circle-info text-base"></i>
         <span id="toast-message">Ready</span>
@@ -54,69 +57,67 @@
     <button id="close-toast-btn" class="text-xs hover:opacity-75"><i class="fa-solid fa-xmark"></i></button>
 </div>
 
-<!-- Main Studio Container -->
-<div class="sketch-card rounded-2xl overflow-hidden mb-12">
-    <!-- Studio Navigation Tabs -->
-    <div class="border-b-2 border-slate-900 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 px-4 sm:px-6">
-        <nav class="flex space-x-2 sm:space-x-8 overflow-x-auto py-2" aria-label="Tabs">
-            <button id="tab-generate" class="tab-btn px-3 py-3 border-b-2 border-slate-900 dark:border-sky-400 font-bold text-sm text-slate-900 dark:text-sky-400 flex items-center whitespace-nowrap">
-                <i class="fa-solid fa-feather mr-2"></i> Manuscript Studio
+<!-- Main Studio Canvas & Tabs -->
+<div class="academic-card rounded-2xl overflow-hidden mb-12">
+    <!-- Studio Tabs Navigation -->
+    <div class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/80 px-4 sm:px-6">
+        <nav class="flex space-x-2 sm:space-x-8 overflow-x-auto py-2" aria-label="Studio Tabs">
+            <button id="tab-generate" class="tab-btn px-3 py-3 border-b-2 border-slate-900 dark:border-sky-400 font-bold text-sm text-slate-900 dark:text-sky-400 flex items-center whitespace-nowrap transition-colors">
+                <i class="fa-solid fa-feather mr-2 text-sky-500"></i> Manuscript Studio
             </button>
-            <button id="tab-search" class="tab-btn px-3 py-3 border-b-2 border-transparent font-medium text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center whitespace-nowrap">
-                <i class="fa-solid fa-magnifying-glass mr-2"></i> Literature Scout
+            <button id="tab-search" class="tab-btn px-3 py-3 border-b-2 border-transparent font-medium text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center whitespace-nowrap transition-colors">
+                <i class="fa-solid fa-magnifying-glass mr-2 text-slate-400"></i> Literature Scout
             </button>
-            <button id="tab-citation" class="tab-btn px-3 py-3 border-b-2 border-transparent font-medium text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center whitespace-nowrap">
-                <i class="fa-solid fa-quote-right mr-2"></i> Citation Engine
+            <button id="tab-citation" class="tab-btn px-3 py-3 border-b-2 border-transparent font-medium text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center whitespace-nowrap transition-colors">
+                <i class="fa-solid fa-quote-right mr-2 text-slate-400"></i> Citation Engine
             </button>
-            <button id="tab-library" class="tab-btn px-3 py-3 border-b-2 border-transparent font-medium text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center whitespace-nowrap">
-                <i class="fa-solid fa-folder-closed mr-2"></i> Research Library
+            <button id="tab-library" class="tab-btn px-3 py-3 border-b-2 border-transparent font-medium text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center whitespace-nowrap transition-colors">
+                <i class="fa-solid fa-folder-closed mr-2 text-slate-400"></i> Research Library
             </button>
         </nav>
         <div id="streaming-progress-bar" class="h-1 bg-sky-500 w-0 transition-all duration-300"></div>
     </div>
 
-    <!-- Tab Panels Body -->
+    <!-- Tab Panels Container -->
     <div class="p-6 sm:p-8">
-        <!-- PANEL 1: MANUSCRIPT GENERATOR STUDIO -->
+        <!-- PANEL 1: MANUSCRIPT STUDIO -->
         <div id="panel-generate" class="tab-panel space-y-6">
-            <!-- Topic & Subject Input -->
+            <!-- Topic & Thesis Prompt Area -->
             <div>
                 <label for="topic-input" class="block text-sm font-bold text-slate-900 dark:text-slate-100 mb-2 flex items-center justify-between">
-                    <span>Research Topic & Thesis Scope</span>
-                    <span id="topic-char-count" class="text-xs font-mono text-slate-500">0 characters</span>
+                    <span>Research Topic & Scope</span>
+                    <span id="topic-char-count" class="text-xs font-mono text-slate-400">0 characters</span>
                 </label>
-                <div class="relative">
-                    <textarea id="topic-input" rows="3" placeholder="Enter a comprehensive research topic or thesis question (e.g., Explain the implications of transformer attention mechanisms on protein folding prediction models)..." class="w-full p-4 rounded-xl sketch-input text-base font-medium resize-none"></textarea>
-                </div>
+                <textarea id="topic-input" rows="3" placeholder="Enter a comprehensive research topic or thesis inquiry (e.g., Attention-based deep neural networks for molecular property prediction and drug discovery)..." class="w-full p-4 rounded-xl academic-input text-base font-medium resize-none shadow-xs"></textarea>
             </div>
 
-            <!-- Pre-grounded Literature Tray (Attached from search) -->
-            <div id="grounding-tray" class="hidden p-4 rounded-xl border-2 border-dashed border-sky-400 bg-sky-50/50 dark:bg-sky-950/20">
+            <!-- Attached Grounding Literature Tray -->
+            <div id="grounding-tray" class="hidden p-4 rounded-xl border border-dashed border-sky-400 bg-sky-50/60 dark:bg-sky-950/20">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="text-xs font-bold uppercase tracking-wider text-sky-800 dark:text-sky-300 flex items-center">
-                        <i class="fa-solid fa-link mr-1.5"></i> Grounding Literature Attached (<span id="grounded-count">0</span> papers)
+                    <span class="text-xs font-bold uppercase tracking-wider text-sky-900 dark:text-sky-300 flex items-center">
+                        <i class="fa-solid fa-link mr-1.5 text-sky-500"></i> Grounded Literature (<span id="grounded-count">0</span> publications attached)
                     </span>
-                    <button id="clear-grounded-btn" class="text-xs text-rose-600 hover:underline font-semibold">Remove All</button>
+                    <button id="clear-grounded-btn" class="text-xs text-rose-600 dark:text-rose-400 hover:underline font-semibold">Clear Tray</button>
                 </div>
                 <div id="grounded-chips-list" class="flex flex-wrap gap-2 text-xs"></div>
             </div>
 
-            <!-- Trending Topics Suggestions -->
+            <!-- Suggested Research Trajectories -->
             <div class="flex items-center space-x-2 overflow-x-auto py-1">
-                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">Try Topic:</span>
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">Suggested:</span>
                 <div id="trending-topics" class="flex flex-wrap gap-2 text-xs">
-                    <button class="sketch-btn px-3 py-1 rounded-full text-xs">Diffusion Models in Molecular Biology</button>
-                    <button class="sketch-btn px-3 py-1 rounded-full text-xs">Zero-Knowledge Proofs in Decentralized Identity</button>
-                    <button class="sketch-btn px-3 py-1 rounded-full text-xs">Quantum Error Correction Thresholds</button>
-                    <button class="sketch-btn px-3 py-1 rounded-full text-xs">Neuromorphic Edge Computing Architectures</button>
+                    <button class="btn-secondary px-3 py-1 rounded-full text-xs">Molecular Property Prediction with Transformers</button>
+                    <button class="btn-secondary px-3 py-1 rounded-full text-xs">Zero-Knowledge Proofs in Healthcare Architecture</button>
+                    <button class="btn-secondary px-3 py-1 rounded-full text-xs">Quantum Error Mitigation Techniques</button>
+                    <button class="btn-secondary px-3 py-1 rounded-full text-xs">Neuromorphic Edge Computing Systems</button>
                 </div>
             </div>
 
-            <!-- Generation Settings Bar -->
+            <!-- Manuscript Settings Bar -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
                 <div>
                     <label for="language-select" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">Language</label>
-                    <select id="language-select" class="w-full p-3 rounded-xl sketch-input font-medium text-sm">
+                    <select id="language-select" class="w-full p-3 rounded-xl academic-input font-medium text-sm">
                         <option value="English">English (Standard Academic)</option>
                         <option value="Spanish">Spanish (Español)</option>
                         <option value="French">French (Français)</option>
@@ -126,8 +127,8 @@
                     </select>
                 </div>
                 <div>
-                    <label for="citation-style-select" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">Citation Style</label>
-                    <select id="citation-style-select" class="w-full p-3 rounded-xl sketch-input font-medium text-sm">
+                    <label for="citation-style-select" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">Citation Format</label>
+                    <select id="citation-style-select" class="w-full p-3 rounded-xl academic-input font-medium text-sm">
                         <option value="APA">APA 7th Edition</option>
                         <option value="IEEE">IEEE Standard</option>
                         <option value="MLA">MLA 9th Edition</option>
@@ -136,88 +137,89 @@
                     </select>
                 </div>
                 <div class="flex items-end">
-                    <button id="generate-paper-btn" class="w-full sketch-btn-primary p-3 rounded-xl font-bold text-sm flex items-center justify-center space-x-2">
+                    <button id="generate-paper-btn" class="w-full btn-primary p-3 rounded-xl font-bold text-sm flex items-center justify-center space-x-2 shadow-sm">
                         <i id="generate-icon" class="fa-solid fa-wand-magic-sparkles"></i>
                         <span id="generate-btn-text">Generate Full Manuscript</span>
                     </button>
                 </div>
             </div>
 
-            <hr class="border-slate-200 dark:border-slate-800">
+            <hr class="border-slate-200 dark:border-slate-800 my-4">
 
-            <!-- Manuscript Editor & Preview Header -->
+            <!-- Manuscript Studio Controls & Metrics -->
             <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div class="flex items-center space-x-4 text-xs font-mono text-slate-500">
+                <div class="flex items-center space-x-5 text-xs font-mono text-slate-500">
                     <div><i class="fa-solid fa-file-lines mr-1 text-sky-500"></i> Words: <span id="word-count" class="font-bold text-slate-900 dark:text-slate-100">0</span></div>
                     <div><i class="fa-solid fa-clock mr-1 text-amber-500"></i> Read Time: <span id="read-time" class="font-bold text-slate-900 dark:text-slate-100">0 min</span></div>
                 </div>
 
-                <!-- Export & Editor Action Controls -->
+                <!-- Export & Format Controls -->
                 <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                    <select id="download-format-select" class="p-2 text-xs font-bold rounded-lg sketch-input bg-white dark:bg-slate-800">
+                    <select id="download-format-select" class="p-2 text-xs font-bold rounded-lg academic-input bg-white dark:bg-slate-800">
                         <option value="pdf">PDF Document (.pdf)</option>
                         <option value="docx">Microsoft Word (.docx)</option>
                         <option value="latex">LaTeX Source (.tex)</option>
                         <option value="md">Markdown (.md)</option>
                         <option value="txt">Plain Text (.txt)</option>
                     </select>
-                    <button id="download-btn" class="sketch-btn px-3 py-2 rounded-lg text-xs font-bold flex items-center" title="Download File">
+                    <button id="download-btn" class="btn-secondary px-3 py-2 rounded-lg text-xs font-bold flex items-center shadow-xs" title="Download Manuscript">
                         <i class="fa-solid fa-file-arrow-down mr-1.5 text-sky-500"></i> Download
                     </button>
-                    <button id="save-library-btn" class="sketch-btn px-3 py-2 rounded-lg text-xs font-bold flex items-center" title="Save to Library">
+                    <button id="save-library-btn" class="btn-secondary px-3 py-2 rounded-lg text-xs font-bold flex items-center shadow-xs" title="Save to Personal Library">
                         <i class="fa-solid fa-floppy-disk mr-1.5 text-emerald-500"></i> Save
                     </button>
-                    <button id="copy-paper-btn" class="sketch-btn px-3 py-2 rounded-lg text-xs font-bold flex items-center" title="Copy to Clipboard">
+                    <button id="copy-paper-btn" class="btn-secondary px-3 py-2 rounded-lg text-xs font-bold flex items-center shadow-xs" title="Copy Raw Markdown">
                         <i class="fa-solid fa-copy mr-1.5"></i> Copy
                     </button>
-                    <button id="toggle-view-btn" class="sketch-btn px-3 py-2 rounded-lg text-xs font-bold flex items-center">
-                        <i class="fa-solid fa-eye mr-1.5 text-indigo-500"></i> <span id="view-mode-text">Preview</span>
+                    <button id="toggle-view-btn" class="btn-secondary px-3 py-2 rounded-lg text-xs font-bold flex items-center shadow-xs">
+                        <i class="fa-solid fa-columns mr-1.5 text-indigo-500"></i> <span id="view-mode-text">Preview</span>
                     </button>
-                    <button id="clear-paper-btn" class="sketch-btn px-3 py-2 rounded-lg text-xs font-bold text-rose-500" title="Clear Canvas">
+                    <button id="clear-paper-btn" class="btn-secondary px-3 py-2 rounded-lg text-xs font-bold text-rose-500 hover:text-rose-600 shadow-xs" title="Clear Canvas">
                         <i class="fa-solid fa-trash-can"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- Editor Work Area -->
-            <div class="relative">
-                <textarea id="paper-editor" rows="18" placeholder="Your generated academic manuscript will stream here live in publication-ready Markdown..." class="w-full p-5 rounded-xl sketch-input font-mono text-sm leading-relaxed"></textarea>
-                <div id="paper-preview" class="hidden w-full p-6 sm:p-8 rounded-xl sketch-card bg-white dark:bg-slate-900 preview-content min-h-[400px]"></div>
+            <!-- Editor Work Area with Dual View Support -->
+            <div id="editor-container" class="relative">
+                <textarea id="paper-editor" rows="18" placeholder="Your generated academic manuscript will stream here live in publication-ready Markdown..." class="w-full p-5 rounded-xl academic-input font-mono text-sm leading-relaxed"></textarea>
+                <div id="paper-preview" class="hidden w-full p-6 sm:p-10 rounded-xl academic-card bg-white dark:bg-slate-900 preview-content min-h-[450px]"></div>
             </div>
         </div>
 
-        <!-- PANEL 2: VERIFIED LITERATURE SCOUT -->
+        <!-- PANEL 2: LITERATURE SCOUT -->
         <div id="panel-search" class="tab-panel hidden space-y-6">
             <div>
-                <label for="search-input" class="block text-sm font-bold text-slate-900 dark:text-slate-100 mb-2">Search 250M+ Peer-Reviewed Papers (OpenAlex & CrossRef)</label>
+                <label for="search-input" class="block text-sm font-bold text-slate-900 dark:text-slate-100 mb-2">Search 250M+ Peer-Reviewed Publications (OpenAlex & CrossRef)</label>
                 <div class="flex flex-col sm:flex-row gap-3">
-                    <input type="text" id="search-input" placeholder="Search keywords, authors, or thesis questions (e.g., CRISPR prime editing therapeutics)..." class="flex-grow p-3 rounded-xl sketch-input text-sm">
-                    <button id="search-papers-btn" class="sketch-btn-primary px-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center space-x-2 whitespace-nowrap">
+                    <input type="text" id="search-input" placeholder="Enter keywords, author names, or research inquiries (e.g., Deep learning for single-cell RNA sequencing)..." class="flex-grow p-3 rounded-xl academic-input text-sm">
+                    <button id="search-papers-btn" class="btn-primary px-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center space-x-2 whitespace-nowrap shadow-sm">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <span>Search Scholarly Works</span>
+                        <span>Search Literature</span>
                     </button>
                 </div>
             </div>
 
+            <!-- Search Results Stream -->
             <div id="search-results-container" class="space-y-4">
-                <div class="p-8 text-center text-slate-400 dark:text-slate-500 font-medium text-sm">
-                    <i class="fa-solid fa-book-open text-4xl mb-3 text-slate-300 dark:text-slate-600 block"></i>
-                    Search above to retrieve real academic papers, verified DOIs, and Open Access PDFs.
+                <div class="p-12 text-center text-slate-400 dark:text-slate-500 font-medium text-sm">
+                    <i class="fa-solid fa-book-bookmark text-4xl mb-3 text-slate-300 dark:text-slate-700 block"></i>
+                    Search above to retrieve verified scholarly literature, live DOIs, and Open Access PDFs.
                 </div>
             </div>
         </div>
 
-        <!-- PANEL 3: CITATION & BIBTEX STUDIO -->
+        <!-- PANEL 3: CITATION ENGINE -->
         <div id="panel-citation" class="tab-panel hidden space-y-6">
             <div>
                 <label for="citation-source-input" class="block text-sm font-bold text-slate-900 dark:text-slate-100 mb-2">Source Information, URL, Title, or DOI</label>
-                <textarea id="citation-source-input" rows="2" placeholder="e.g., https://doi.org/10.1038/nature12373 or 'Attention Is All You Need, Vaswani et al., 2017'..." class="w-full p-3 rounded-xl sketch-input text-sm resize-none"></textarea>
+                <textarea id="citation-source-input" rows="2" placeholder="e.g., https://doi.org/10.1038/s41586-021-03819-2 or 'Highly accurate protein structure prediction with AlphaFold, Jumper et al., Nature 2021'..." class="w-full p-3 rounded-xl academic-input text-sm resize-none"></textarea>
             </div>
 
             <div class="flex flex-col sm:flex-row gap-4 items-end">
                 <div class="flex-grow w-full sm:w-auto">
                     <label for="citation-format-style" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">Target Citation Format</label>
-                    <select id="citation-format-style" class="w-full p-3 rounded-xl sketch-input text-sm font-semibold">
+                    <select id="citation-format-style" class="w-full p-3 rounded-xl academic-input text-sm font-semibold">
                         <option value="APA">APA 7th Edition</option>
                         <option value="MLA">MLA 9th Edition</option>
                         <option value="Chicago">Chicago Manual of Style (17th)</option>
@@ -225,7 +227,7 @@
                         <option value="BibTeX">BibTeX (.bib format)</option>
                     </select>
                 </div>
-                <button id="format-citation-btn" class="w-full sm:w-auto sketch-btn-primary px-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center space-x-2">
+                <button id="format-citation-btn" class="w-full sm:w-auto btn-primary px-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center space-x-2 shadow-sm">
                     <i class="fa-solid fa-quote-left"></i>
                     <span>Format & Save Citation</span>
                 </button>
@@ -234,8 +236,8 @@
             <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Formatted Citation Result</label>
                 <div class="relative">
-                    <textarea id="citation-output-box" rows="3" readonly placeholder="Your formatted academic citation will appear here..." class="w-full p-4 rounded-xl sketch-input font-mono text-sm"></textarea>
-                    <button id="copy-citation-btn" class="absolute top-3 right-3 sketch-btn px-3 py-1 rounded text-xs font-semibold">
+                    <textarea id="citation-output-box" rows="3" readonly placeholder="Your formatted academic citation will appear here..." class="w-full p-4 rounded-xl academic-input font-mono text-sm"></textarea>
+                    <button id="copy-citation-btn" class="absolute top-3 right-3 btn-secondary px-3 py-1 rounded-md text-xs font-semibold">
                         <i class="fa-solid fa-copy mr-1"></i> Copy
                     </button>
                 </div>
@@ -246,26 +248,26 @@
         <div id="panel-library" class="tab-panel hidden space-y-6">
             <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
                 <h3 class="font-extrabold text-lg text-slate-900 dark:text-white flex items-center">
-                    <i class="fa-solid fa-bookmark text-sky-500 mr-2"></i> Your Saved Manuscripts & Citations
+                    <i class="fa-solid fa-bookmark text-sky-500 mr-2"></i> Saved Manuscripts & Citations
                 </h3>
-                <button id="refresh-library-btn" class="sketch-btn px-3 py-1.5 rounded-lg text-xs font-semibold">
+                <button id="refresh-library-btn" class="btn-secondary px-3 py-1.5 rounded-lg text-xs font-semibold">
                     <i class="fa-solid fa-rotate-right mr-1"></i> Refresh
                 </button>
             </div>
 
-            <!-- Library Tabs -->
+            <!-- Two-Column Library Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Saved Papers Column -->
+                <!-- Manuscripts List -->
                 <div>
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Saved Papers</h4>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Saved Manuscripts</h4>
                     <div id="library-papers-list" class="space-y-3">
                         <div class="text-xs text-slate-400 italic">No saved papers yet. Generate a paper and click Save.</div>
                     </div>
                 </div>
 
-                <!-- Saved Citations Column -->
+                <!-- Citations List -->
                 <div>
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Saved Citations</h4>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Archived Citations</h4>
                     <div id="library-citations-list" class="space-y-3">
                         <div class="text-xs text-slate-400 italic">No citations saved yet.</div>
                     </div>
@@ -277,14 +279,14 @@
 
 <!-- Floating AI Research Copilot -->
 <div id="copilot-container" class="fixed bottom-6 right-6 z-50">
-    <button id="copilot-toggle-btn" class="sketch-btn-primary w-14 h-14 rounded-full flex items-center justify-center text-xl shadow-2xl hover:scale-105 transition-all" aria-label="Open AI Copilot">
+    <button id="copilot-toggle-btn" class="btn-primary w-13 h-13 rounded-full flex items-center justify-center text-xl shadow-xl hover:scale-105 transition-all" aria-label="Open AI Copilot">
         <i class="fa-solid fa-comments"></i>
     </button>
 
-    <div id="copilot-window" class="hidden absolute bottom-18 right-0 w-84 sm:w-96 rounded-2xl sketch-card bg-white dark:bg-slate-900 flex flex-col shadow-2xl overflow-hidden" style="height: 480px;">
-        <div class="p-4 border-b-2 border-slate-900 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
+    <div id="copilot-window" class="hidden absolute bottom-16 right-0 w-84 sm:w-96 rounded-2xl academic-card bg-white dark:bg-slate-900 flex flex-col shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800" style="height: 480px;">
+        <div class="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
             <div class="flex items-center space-x-2">
-                <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span class="font-extrabold text-sm text-slate-900 dark:text-white">ScholarForge Copilot</span>
             </div>
             <button id="close-copilot-btn" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-xs">
@@ -294,14 +296,14 @@
 
         <div id="copilot-messages" class="flex-grow p-4 overflow-y-auto space-y-3 text-xs leading-relaxed">
             <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
-                👋 Hello! I am your AI academic research copilot. Ask me to brainstorm hypothesis angles, refine an outline, format a LaTeX formula, or critique your methodology.
+                👋 Hello! I am your research copilot. Ask me to formulate hypotheses, analyze methodologies, structure bibliographies, or format equations.
             </div>
         </div>
 
-        <div class="p-3 border-t-2 border-slate-900 dark:border-slate-800 bg-white dark:bg-slate-900">
+        <div class="p-3 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
             <div class="flex space-x-2">
-                <input type="text" id="copilot-input" placeholder="Ask a research question..." class="flex-grow p-2.5 rounded-lg sketch-input text-xs">
-                <button id="copilot-send-btn" class="sketch-btn-primary px-4 rounded-lg text-xs font-bold">
+                <input type="text" id="copilot-input" placeholder="Ask a research inquiry..." class="flex-grow p-2.5 rounded-lg academic-input text-xs">
+                <button id="copilot-send-btn" class="btn-primary px-4 rounded-lg text-xs font-bold">
                     <i class="fa-solid fa-paper-plane"></i>
                 </button>
             </div>

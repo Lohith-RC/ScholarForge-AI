@@ -495,7 +495,7 @@ document.addEventListener('DOMContentLoaded', () => {
             searchResultsContainer.innerHTML = '';
             data.papers.forEach(paper => {
                 const card = document.createElement('div');
-                card.className = 'sketch-card p-5 rounded-xl space-y-3';
+                card.className = 'academic-card p-5 rounded-xl space-y-3';
                 const authorsStr = (paper.authors && paper.authors.length > 0) ? paper.authors.join(', ') : 'Unknown Authors';
                 
                 card.innerHTML = `
@@ -512,7 +512,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <i class="fa-solid fa-user-group text-slate-400 mr-1"></i> ${authorsStr}
                     </div>
 
-                    <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
                         ${paper.abstract}
                     </p>
 
@@ -524,10 +524,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
 
                         <div class="flex items-center space-x-2">
-                            <button class="cite-this-btn sketch-btn px-3 py-1 rounded text-xs" data-title="${encodeURIComponent(paper.title)}" data-doi="${encodeURIComponent(paper.doi || '')}" data-authors="${encodeURIComponent(authorsStr)}">
+                            <button class="cite-this-btn btn-secondary px-3 py-1 rounded-md text-xs font-semibold" data-title="${encodeURIComponent(paper.title)}" data-doi="${encodeURIComponent(paper.doi || '')}" data-authors="${encodeURIComponent(authorsStr)}">
                                 <i class="fa-solid fa-quote-right mr-1 text-sky-500"></i> Cite
                             </button>
-                            <button class="ground-this-btn sketch-btn-primary px-3 py-1 rounded text-xs" data-json='${encodeURIComponent(JSON.stringify(paper))}'>
+                            <button class="ground-this-btn btn-primary px-3 py-1 rounded-md text-xs font-semibold" data-json='${encodeURIComponent(JSON.stringify(paper))}'>
                                 <i class="fa-solid fa-plus mr-1"></i> Ground Paper
                             </button>
                         </div>
@@ -640,8 +640,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="text-slate-400 mt-0.5">${p.word_count.toLocaleString()} words &bull; ${p.created_at}</div>
                         </div>
                         <div class="flex items-center space-x-1.5 whitespace-nowrap">
-                            <button class="load-paper-btn sketch-btn px-2.5 py-1 rounded text-xs" data-id="${p.id}" title="Load into Studio"><i class="fa-solid fa-folder-open text-sky-500"></i></button>
-                            <button class="delete-paper-btn sketch-btn px-2.5 py-1 rounded text-xs text-rose-500" data-id="${p.id}" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
+                            <button class="load-paper-btn btn-secondary px-2.5 py-1 rounded text-xs" data-id="${p.id}" title="Load into Studio"><i class="fa-solid fa-folder-open text-sky-500"></i></button>
+                            <button class="delete-paper-btn btn-secondary px-2.5 py-1 rounded text-xs text-rose-500" data-id="${p.id}" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
                     `;
                     libraryPapersList.appendChild(item);
@@ -691,8 +691,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="font-bold text-sky-500">[${c.style}]</span> ${c.formatted_citation}
                         </div>
                         <div class="flex items-center space-x-1 whitespace-nowrap">
-                            <button class="copy-cit-item-btn sketch-btn px-2 py-1 rounded" data-text="${encodeURIComponent(c.formatted_citation)}" title="Copy"><i class="fa-solid fa-copy"></i></button>
-                            <button class="del-cit-item-btn sketch-btn px-2 py-1 rounded text-rose-500" data-id="${c.id}" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
+                            <button class="copy-cit-item-btn btn-secondary px-2 py-1 rounded" data-text="${encodeURIComponent(c.formatted_citation)}" title="Copy"><i class="fa-solid fa-copy"></i></button>
+                            <button class="del-cit-item-btn btn-secondary px-2 py-1 rounded text-rose-500" data-id="${c.id}" title="Delete"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
                     `;
                     libraryCitationsList.appendChild(item);
