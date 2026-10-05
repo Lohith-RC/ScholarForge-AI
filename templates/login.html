@@ -3,50 +3,180 @@
 {% block title %}Sign In &mdash; ScholarForge{% endblock %}
 
 {% block content %}
-<div class="max-w-md mx-auto my-12">
-    <div class="text-center mb-8">
-        <div class="w-12 h-12 rounded-2xl bg-slate-900 dark:bg-sky-400 text-white dark:text-slate-900 mx-auto flex items-center justify-center font-extrabold text-2xl shadow-md mb-4">
-            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
-                <path d="M6 6h10"/>
-                <path d="M6 10h10"/>
-                <path d="m9 14 2 2 4-4"/>
-            </svg>
+<div class="max-w-6xl mx-auto my-6 sm:my-10">
+    <div class="academic-card rounded-3xl overflow-hidden shadow-2xl grid grid-cols-1 lg:grid-cols-12 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+        
+        <!-- Left Side: Academic Showcase & Editorial Value Prop (5 cols on lg) -->
+        <div class="lg:col-span-5 p-8 sm:p-10 bg-slate-900 text-white flex flex-col justify-between relative overflow-hidden">
+            <!-- Subtle Background Mesh Glow -->
+            <div class="absolute -top-24 -left-24 w-80 h-80 rounded-full bg-sky-500/10 blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -right-24 w-80 h-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none"></div>
+
+            <div class="relative z-10 space-y-6">
+                <!-- Brand Badge -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-sky-400 text-slate-950 flex items-center justify-center font-extrabold text-xl shadow">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
+                            <path d="M6 6h10"/>
+                            <path d="M6 10h10"/>
+                            <path d="m9 14 2 2 4-4"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="font-extrabold text-lg tracking-tight text-white leading-none">ScholarForge</div>
+                        <div class="text-[10px] uppercase font-bold tracking-widest text-sky-400 mt-1">Research Workstation</div>
+                    </div>
+                </div>
+
+                <!-- Editorial Headline -->
+                <div class="pt-4">
+                    <h2 class="font-academic text-2xl sm:text-3xl font-bold leading-snug text-slate-100">
+                        The intelligence workspace for serious scientific inquiry.
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-3 leading-relaxed">
+                        Author manuscripts, discover 250M+ verified peer-reviewed publications, and eliminate hallucinated citations with real-time scholarly grounding.
+                    </p>
+                </div>
+
+                <!-- Feature Highlights -->
+                <div class="space-y-3.5 pt-2">
+                    <div class="flex items-start space-x-3 text-xs text-slate-300">
+                        <div class="w-5 h-5 rounded-md bg-sky-950 text-sky-400 flex items-center justify-center shrink-0 mt-0.5 border border-sky-800">
+                            <i class="fa-solid fa-check text-[10px]"></i>
+                        </div>
+                        <div>
+                            <span class="font-bold text-white">Verified DOI Literature Grounding:</span> Connects with OpenAlex and CrossRef to cite real publications.
+                        </div>
+                    </div>
+
+                    <div class="flex items-start space-x-3 text-xs text-slate-300">
+                        <div class="w-5 h-5 rounded-md bg-sky-950 text-sky-400 flex items-center justify-center shrink-0 mt-0.5 border border-sky-800">
+                            <i class="fa-solid fa-check text-[10px]"></i>
+                        </div>
+                        <div>
+                            <span class="font-bold text-white">Multi-Format Compilation:</span> Native PDF (ReportLab), Word (.docx), LaTeX, and Markdown.
+                        </div>
+                    </div>
+
+                    <div class="flex items-start space-x-3 text-xs text-slate-300">
+                        <div class="w-5 h-5 rounded-md bg-sky-950 text-sky-400 flex items-center justify-center shrink-0 mt-0.5 border border-sky-800">
+                            <i class="fa-solid fa-check text-[10px]"></i>
+                        </div>
+                        <div>
+                            <span class="font-bold text-white">Mathematical LaTeX Engine:</span> Instant KaTeX rendering for formulas and matrices.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scholar Testimonial Card -->
+            <div class="relative z-10 mt-8 pt-6 border-t border-slate-800/80">
+                <blockquote class="font-academic italic text-xs sm:text-sm text-slate-300 leading-relaxed">
+                    &ldquo;ScholarForge streamlines our preliminary literature review and manuscript scaffolding while ensuring every cited reference corresponds to a verified publication.&rdquo;
+                </blockquote>
+                <div class="flex items-center space-x-3 mt-3">
+                    <div class="w-7 h-7 rounded-full bg-slate-800 text-sky-400 font-bold text-xs flex items-center justify-center border border-slate-700">
+                        SC
+                    </div>
+                    <div class="text-[11px]">
+                        <div class="font-bold text-slate-200">Scholarly Collaborative</div>
+                        <div class="text-slate-500">Computational Research Group</div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Welcome Back</h1>
-        <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Access your research workspace and library</p>
-    </div>
 
-    <div class="academic-card rounded-2xl p-8 bg-white dark:bg-slate-900 shadow-md">
-        <form method="POST" action="{{ url_for('login') }}" class="space-y-5">
-            <div>
-                <label for="username" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">Username</label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400"><i class="fa-solid fa-user"></i></span>
-                    <input type="text" id="username" name="username" required placeholder="alex_scholar"
-                           class="w-full pl-10 pr-4 py-3 rounded-xl academic-input text-sm">
+        <!-- Right Side: Sign In Form (7 cols on lg) -->
+        <div class="lg:col-span-7 p-8 sm:p-12 lg:p-14 bg-white dark:bg-slate-900 flex flex-col justify-center">
+            <div class="max-w-md mx-auto w-full">
+                <!-- Header -->
+                <div class="mb-8">
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                        Sign In to Your Workspace
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1.5">
+                        Access your manuscript drafts, citation bibliographies, and research library.
+                    </p>
+                </div>
+
+                <!-- Form -->
+                <form method="POST" action="{{ url_for('login') }}" class="space-y-5">
+                    <div>
+                        <label for="username" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
+                            Academic Username
+                        </label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 pointer-events-none">
+                                <i class="fa-solid fa-user-graduate text-sm"></i>
+                            </span>
+                            <input type="text" id="username" name="username" required autocomplete="username"
+                                   placeholder="e.g., alex_curie"
+                                   class="w-full pl-10 pr-4 py-3 rounded-xl academic-input text-sm font-medium shadow-xs">
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label for="password" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                                Password
+                            </label>
+                        </div>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 pointer-events-none">
+                                <i class="fa-solid fa-lock text-sm"></i>
+                            </span>
+                            <input type="password" id="password" name="password" required autocomplete="current-password"
+                                   placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                                   class="w-full pl-10 pr-11 py-3 rounded-xl academic-input text-sm font-medium shadow-xs">
+                            <button type="button" id="toggle-password-btn" class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs">
+                                <i id="toggle-password-icon" class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="submit" class="w-full btn-primary py-3.5 px-6 rounded-xl font-bold text-sm flex items-center justify-center space-x-2 shadow-md">
+                            <span>Sign In to Workspace</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Footer Switch -->
+                <div class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+                    <div>
+                        Don't have an academic profile yet?
+                    </div>
+                    <a href="{{ url_for('register') }}" class="font-bold text-sky-600 dark:text-sky-400 hover:underline flex items-center space-x-1">
+                        <span>Create Workspace Profile</span>
+                        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                    </a>
+                </div>
+
+                <!-- Academic Security Notice -->
+                <div class="mt-6 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 flex items-center space-x-2">
+                    <i class="fa-solid fa-shield-halved text-emerald-500 text-sm shrink-0"></i>
+                    <span>Sessions are encrypted and authenticated with secure password hashes.</span>
                 </div>
             </div>
-
-            <div>
-                <label for="password" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">Password</label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400"><i class="fa-solid fa-lock"></i></span>
-                    <input type="password" id="password" name="password" required placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                           class="w-full pl-10 pr-4 py-3 rounded-xl academic-input text-sm">
-                </div>
-            </div>
-
-            <button type="submit" class="w-full btn-primary p-3 rounded-xl font-bold text-sm flex items-center justify-center space-x-2 shadow-sm">
-                <span>Sign In to Workspace</span>
-                <i class="fa-solid fa-arrow-right"></i>
-            </button>
-        </form>
-
-        <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800 text-center text-xs text-slate-500">
-            Don't have an academic profile? 
-            <a href="{{ url_for('register') }}" class="font-bold text-sky-600 dark:text-sky-400 hover:underline">Register here</a>
         </div>
     </div>
 </div>
+
+<script>
+    // Password visibility toggle
+    document.addEventListener('DOMContentLoaded', () => {
+        const toggleBtn = document.getElementById('toggle-password-btn');
+        const passwordInput = document.getElementById('password');
+        const toggleIcon = document.getElementById('toggle-password-icon');
+        if (toggleBtn && passwordInput && toggleIcon) {
+            toggleBtn.addEventListener('click', () => {
+                const isPassword = passwordInput.type === 'password';
+                passwordInput.type = isPassword ? 'text' : 'password';
+                toggleIcon.className = isPassword ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+            });
+        }
+    });
+</script>
 {% endblock %}
