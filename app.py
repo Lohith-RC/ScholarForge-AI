@@ -163,6 +163,24 @@ def logout():
 
 
 @app.route('/')
+def home():
+    """
+    Public entry point: serves the minimal hype teaser landing page
+    powered by the interactive React Bits <Dither /> retro-wave shader.
+    If already logged in, seamlessly forwards to the research workstation.
+    """
+    if current_user.is_authenticated:
+        return redirect(url_for('serve_index'))
+    return render_template('landing.html')
+
+
+@app.route('/teaser')
+def teaser():
+    """Dedicated route to experience the Dither interactive teaser."""
+    return render_template('landing.html')
+
+
+@app.route('/app')
 @login_required
 def serve_index():
     return render_template('index.html', username=current_user.username)
