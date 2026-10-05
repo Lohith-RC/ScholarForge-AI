@@ -1,24 +1,21 @@
 import os
 import uuid
 import json
-from flask import Flask, request, jsonify, send_file, render_template, redirect, url_for, flash, after_this_request
+import shutil
+from datetime import datetime
+from flask import Flask, request, jsonify, send_file, render_template, redirect, url_for, flash, Response, stream_with_context
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-
 from dotenv import load_dotenv
-load_dotenv() 
 
-import shutil
+load_dotenv()
 
-# Resolve Pandoc executable path dynamically across OS environments
-PANDOC_PATH = shutil.which("pandoc") or "C:\\Program Files\\Pandoc\\pandoc.exe"
-if os.path.exists(PANDOC_PATH):
-    os.environ.setdefault('PYPANDOC_PANDOC', PANDOC_PATH)
-
+# Specialized project modules
+import academic_engine
+import document_compiler
 import google.generativeai as genai
-import pypandoc
 
 app = Flask(__name__)
 CORS(app)
@@ -32,16 +29,73 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+# --- Database Models ---
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
-    password_hash = db.Column(db.String(150), nullable=False)
-    def set_password(self, password): self.password_hash = generate_password_hash(password)
-    def check_password(self, password): return check_password_hash(self.password_hash, password)
+    password_hash = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    papers = db.relationship('Paper', backref='author', lazy=True, cascade='all, delete-orphan')
+    citations = db.relationship('Citation', backref='user', lazy=True, cascade='all, delete-orphan')
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+
+class Paper(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    title = db.Column(db.String(255), nullable=False)
+    topic = db.Column(db.String(255), nullable=False)
+    language = db.Column(db.String(50), default='English')
+    citation_style = db.Column(db.String(50), default='APA')
+    content = db.Column(db.Text, nullable=False)
+    word_count = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "topic": self.topic,
+            "language": self.language,
+            "citation_style": self.citation_style,
+            "content": self.content,
+            "word_count": self.word_count,
+            "created_at": self.created_at.strftime("%Y-%m-%d %H:%M")
+        }
+
+
+class Citation(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    source = db.Column(db.Text, nullable=False)
+    style = db.Column(db.String(20), nullable=False)
+    formatted_citation = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "source": self.source,
+            "style": self.style,
+            "formatted_citation": self.formatted_citation,
+            "created_at": self.created_at.strftime("%Y-%m-%d %H:%M")
+        }
+
 
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
+
+
+# --- Gemini Model Initialization ---
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 gemini_model = None
@@ -49,8 +103,9 @@ try:
     if GEMINI_API_KEY:
         genai.configure(api_key=GEMINI_API_KEY)
         gemini_model = genai.GenerativeModel('models/gemini-2.5-flash')
-        print("Gemini model initialized successfully.")
-    else: raise ValueError("API Key is missing or not set in .env file.")
+        print("ScholarForge AI: Gemini model initialized successfully.")
+    else:
+        print("ScholarForge AI Warning: GEMINI_API_KEY missing from environment.")
 except Exception as e:
     print(f"FATAL: Error initializing Gemini model: {e}")
 
@@ -59,148 +114,176 @@ TEMP_DIR = os.path.join(BASE_DIR, 'temp_files')
 if not os.path.exists(TEMP_DIR):
     os.makedirs(TEMP_DIR, exist_ok=True)
 
-# --- Routes are unchanged except for the /find-papers prompt ---
+
+# --- Authentication Routes ---
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    # ... (code is unchanged)
-    if current_user.is_authenticated: return redirect(url_for('serve_index'))
+    if current_user.is_authenticated:
+        return redirect(url_for('serve_index'))
     if request.method == 'POST':
-        username, password = request.form.get('username'), request.form.get('password')
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '')
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
-            login_user(user); return redirect(url_for('serve_index'))
-        else: flash('Invalid username or password.', 'danger')
+            login_user(user)
+            return redirect(url_for('serve_index'))
+        else:
+            flash('Invalid username or password.', 'danger')
     return render_template('login.html')
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    # ... (code is unchanged)
-    if current_user.is_authenticated: return redirect(url_for('serve_index'))
+    if current_user.is_authenticated:
+        return redirect(url_for('serve_index'))
     if request.method == 'POST':
-        username, password = request.form.get('username'), request.form.get('password')
-        if User.query.filter_by(username=username).first():
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '')
+        if not username or not password:
+            flash('Please enter both username and password.', 'warning')
+        elif User.query.filter_by(username=username).first():
             flash('Username already exists. Please choose another.', 'warning')
         else:
-            new_user = User(username=username); new_user.set_password(password)
-            db.session.add(new_user); db.session.commit()
+            new_user = User(username=username)
+            new_user.set_password(password)
+            db.session.add(new_user)
+            db.session.commit()
             flash('Account created successfully! Please log in.', 'success')
             return redirect(url_for('login'))
     return render_template('register.html')
 
+
 @app.route('/logout')
 @login_required
 def logout():
-    # ... (code is unchanged)
-    logout_user(); return redirect(url_for('login'))
+    logout_user()
+    flash('You have been logged out safely.', 'info')
+    return redirect(url_for('login'))
+
 
 @app.route('/')
 @login_required
 def serve_index():
-    # ... (code is unchanged)
     return render_template('index.html', username=current_user.username)
+
+
+# --- Research Generation & Streaming Routes ---
+
+@app.route('/generate-stream', methods=['POST'])
+@login_required
+def generate_stream():
+    """
+    Streams research paper generation via Server-Sent Events (SSE).
+    Supports injecting verified literature to eliminate hallucinations.
+    """
+    if not gemini_model:
+        return jsonify({'success': False, 'message': 'Gemini API not configured. Check GEMINI_API_KEY in .env'}), 500
+
+    data = request.json or {}
+    topic = data.get('topic', '').strip()
+    language = data.get('language', 'English')
+    style = data.get('style', 'APA')
+    grounded_papers = data.get('grounded_papers', [])
+
+    if not topic:
+        return jsonify({'success': False, 'message': 'Please enter a research topic.'}), 400
+
+    prompt = academic_engine.build_grounded_academic_prompt(
+        topic=topic,
+        language=language,
+        citation_style=style,
+        grounded_papers=grounded_papers
+    )
+
+    def generate():
+        try:
+            response_stream = gemini_model.generate_content(prompt, stream=True)
+            for chunk in response_stream:
+                if chunk.text:
+                    payload = json.dumps({"text": chunk.text, "done": False})
+                    yield f"data: {payload}\n\n"
+            # Final completion event
+            payload = json.dumps({"done": True})
+            yield f"data: {payload}\n\n"
+        except Exception as e:
+            err_payload = json.dumps({"error": str(e), "done": True})
+            yield f"data: {err_payload}\n\n"
+
+    return Response(stream_with_context(generate()), mimetype='text/event-stream')
+
 
 @app.route('/generate', methods=['POST'])
 @login_required
 def generate_paper():
-    # ... (code is unchanged)
-    if not gemini_model: return jsonify({'success': False, 'message': 'API Key Error: Gemini model not initialized.'}), 500
+    """Synchronous fallback for generating paper."""
+    if not gemini_model:
+        return jsonify({'success': False, 'message': 'API Key Error: Gemini model not initialized.'}), 500
     try:
-        data = request.json
-        topic, language = data.get('topic'), data.get('language', 'English')
-        if not topic: return jsonify({'success': False, 'message': 'Please enter a research topic.'}), 400
-        system_instruction = (
-            f"You are a distinguished academic researcher, peer reviewer, and scientific scholar. "
-            f"Your objective is to produce a comprehensive, publication-grade academic research paper in {language} on the provided topic.\n\n"
-            f"Structure the research paper systematically following formal academic conventions:\n"
-            f"1. Title & Abstract: An engaging, academic title followed by a concise abstract (150-250 words) summarizing research rationale, methodology, primary findings, and broader impact, accompanied by 4-6 Index Keywords.\n"
-            f"2. Introduction: Background, problem statement, research significance, and research questions/hypotheses.\n"
-            f"3. Literature Review & Conceptual Framework: Synthesis of foundational scholarship, current discourse, and theoretical gaps.\n"
-            f"4. Methodology / Architectural Design: Research paradigm, procedural workflows, materials/datasets, and analytical frameworks.\n"
-            f"5. Results & Discussion: Rigorous examination of findings, comparative analysis with existing paradigms, and practical implications.\n"
-            f"6. Limitations & Future Directions: Boundaries of the present work and proposed future research inquiries.\n"
-            f"7. Conclusion: Summary of core contributions and concluding takeaways.\n"
-            f"8. References: A structured bibliography in academic citation style.\n\n"
-            f"Format the entire output in clean, elegant GitHub-flavored Markdown with clear headings (#, ##, ###), bullet points, and formatted equations/tables where relevant."
+        data = request.json or {}
+        topic = data.get('topic', '').strip()
+        language = data.get('language', 'English')
+        style = data.get('style', 'APA')
+        grounded_papers = data.get('grounded_papers', [])
+
+        if not topic:
+            return jsonify({'success': False, 'message': 'Please enter a research topic.'}), 400
+
+        prompt = academic_engine.build_grounded_academic_prompt(
+            topic=topic,
+            language=language,
+            citation_style=style,
+            grounded_papers=grounded_papers
         )
-        model_with_instruction = genai.GenerativeModel('models/gemini-2.5-flash', system_instruction=system_instruction)
-        response = model_with_instruction.generate_content(f"Generate the comprehensive research paper for: {topic}.")
+        response = gemini_model.generate_content(prompt)
         return jsonify({'success': True, 'content': response.text})
     except Exception as e:
-        print(f"Gemini API Error: {e}"); return jsonify({'success': False, 'message': f'Failed to generate paper. API Error: {str(e)}'}), 500
+        print(f"Gemini API Error: {e}")
+        return jsonify({'success': False, 'message': f'Failed to generate paper. API Error: {str(e)}'}), 500
 
-@app.route('/download', methods=['POST'])
-@login_required
-def download_paper():
-    # ... (code is unchanged)
-    data = request.json
-    markdown_content, download_format = data.get('content'), data.get('format').lower()
-    if not markdown_content or download_format not in ['pdf', 'docx', 'txt', 'markdown']: return jsonify({'success': False, 'message': 'Invalid format or content'}), 400
-    if download_format in ['txt', 'markdown']:
-        from io import BytesIO
-        mimetype = 'text/markdown' if download_format == 'markdown' else 'text/plain'
-        return send_file(BytesIO(markdown_content.encode('utf-8')), mimetype=mimetype, as_attachment=True, download_name=f'research_paper.{download_format}')
-    unique_id = uuid.uuid4()
-    temp_md_file, output_file = os.path.join(TEMP_DIR, f'temp_{unique_id}.md'), os.path.join(TEMP_DIR, f'output_{unique_id}.{download_format}')
-    try:
-        with open(temp_md_file, 'w', encoding='utf-8') as f: f.write(markdown_content)
-        pypandoc.convert_file(source_file=temp_md_file, to=download_format, outputfile=output_file, extra_args=['--pdf-engine=xelatex', '-V', 'mainfont=Arial'])
-        mimetype_map = {'pdf': 'application/pdf', 'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'}
-        response = send_file(output_file, as_attachment=True, download_name=f'research_paper.{download_format}', mimetype=mimetype_map.get(download_format, 'application/octet-stream'))
-        @after_this_request
-        def cleanup(response):
-            try: os.remove(output_file)
-            except OSError as e: print(f"Error cleaning up file {output_file}: {e}")
-            return response
-        return response
-    except Exception as e:
-        print(f"Pandoc Conversion Error: {e}"); return jsonify({'success': False, 'message': f'Conversion failed. Error: {str(e)}'}), 500
-    finally:
-        if os.path.exists(temp_md_file): os.remove(temp_md_file)
+
+# --- Verified Academic Literature Search ---
 
 @app.route('/find-papers', methods=['POST'])
 @login_required
 def find_papers():
-    if not gemini_model:
-        return jsonify({'success': False, 'message': 'API Key Error: Gemini model not initialized.'}), 500
+    """
+    Retrieves verified, peer-reviewed literature from OpenAlex and CrossRef.
+    Returns real papers with DOIs, author lists, citation counts, and Open Access PDF links.
+    """
     try:
-        data = request.json
-        topic = data.get('topic')
-        style = data.get('style', 'APA')
+        data = request.json or {}
+        topic = data.get('topic', '').strip()
         if not topic:
             return jsonify({'success': False, 'message': 'Please enter a topic to find papers.'}), 400
-        
-        # --- THIS IS THE ONLY PART THAT HAS CHANGED ---
-        system_instruction = (
-            f"You are a specialist research librarian. Your sole task is to generate a bibliography of published research papers "
-            f"based on a given topic and citation style. DO NOT explain the topic. DO NOT write any introductory text. "
-            f"Your response MUST be only a numbered list of 5 to 7 citations in {style} format. The list must begin with '1.' and contain nothing else."
-        )
-        
-        user_query = f"Generate a bibliography of research papers on the topic: {topic}"
-        
-        model_with_instruction = genai.GenerativeModel(
-            'models/gemini-2.5-flash',
-            system_instruction=system_instruction
-        )
-        response = model_with_instruction.generate_content(user_query)
-        
-        return jsonify({'success': True, 'bibliography': response.text.strip()})
-    
-    except Exception as e:
-        print(f"Gemini Find Papers API Error: {e}")
-        return jsonify({'success': False, 'message': f'Failed to find papers. API Error: {str(e)}'}), 500
 
+        papers = academic_engine.search_verified_papers(topic, limit=6)
+        return jsonify({
+            'success': True,
+            'papers': papers,
+            'count': len(papers)
+        })
+    except Exception as e:
+        print(f"Scholarly Search Error: {e}")
+        return jsonify({'success': False, 'message': f'Search failed: {str(e)}'}), 500
+
+
+# --- Citation Engine ---
 
 @app.route('/generate-citation', methods=['POST'])
 @login_required
 def generate_citation():
-    # ... (code is unchanged)
-    if not gemini_model: return jsonify({'success': False, 'message': 'API Key Error: Gemini model not initialized.'}), 500
+    """Formats source into APA, MLA, Chicago, IEEE, or BibTeX."""
+    if not gemini_model:
+        return jsonify({'success': False, 'message': 'Gemini model not initialized.'}), 500
     try:
-        data = request.json
-        source, style = data.get('source'), data.get('style', 'APA')
-        if not source: return jsonify({'success': False, 'message': 'Please enter source information to cite.'}), 400
+        data = request.json or {}
+        source = data.get('source', '').strip()
+        style = data.get('style', 'APA')
+
+        if not source:
+            return jsonify({'success': False, 'message': 'Please enter source information to cite.'}), 400
+
         system_instruction = (
             f"You are a professional academic citation and bibliography specialist. "
             f"Your task is to parse the provided source information and format it accurately according to the {style} citation style standard. "
@@ -209,26 +292,179 @@ def generate_citation():
         )
         model_with_instruction = genai.GenerativeModel('models/gemini-2.5-flash', system_instruction=system_instruction)
         response = model_with_instruction.generate_content(f"Format this source in {style} style: '{source}'")
-        return jsonify({'success': True, 'citation': response.text.strip()})
+        citation_text = response.text.strip()
+
+        # Automatically save citation to user library
+        new_citation = Citation(
+            user_id=current_user.id,
+            source=source,
+            style=style,
+            formatted_citation=citation_text
+        )
+        db.session.add(new_citation)
+        db.session.commit()
+
+        return jsonify({'success': True, 'citation': citation_text, 'id': new_citation.id})
     except Exception as e:
-        print(f"Gemini Citation API Error: {e}"); return jsonify({'success': False, 'message': f'Failed to generate citation. API Error: {str(e)}'}), 500
+        print(f"Citation API Error: {e}")
+        return jsonify({'success': False, 'message': f'Failed to generate citation: {str(e)}'}), 500
+
+
+# --- Multi-Format Document Compilation & Download ---
+
+@app.route('/download', methods=['POST'])
+@login_required
+def download_paper():
+    """
+    Compiles and delivers manuscript in PDF, DOCX, LaTeX (.tex), Markdown, or TXT.
+    Uses resilient native compilers with zero external XeLaTeX requirement.
+    """
+    try:
+        data = request.json or {}
+        markdown_content = data.get('content', '')
+        download_format = data.get('format', 'pdf').lower()
+        title = data.get('title', 'Research_Paper')
+
+        if not markdown_content:
+            return jsonify({'success': False, 'message': 'Manuscript content cannot be empty.'}), 400
+
+        buffer, filename, mimetype = document_compiler.compile_research_document(
+            markdown_content=markdown_content,
+            output_format=download_format,
+            title=title
+        )
+
+        return send_file(
+            buffer,
+            as_attachment=True,
+            download_name=filename,
+            mimetype=mimetype
+        )
+    except Exception as e:
+        print(f"Document Compilation Error: {e}")
+        return jsonify({'success': False, 'message': f'Export failed: {str(e)}'}), 500
+
+
+# --- User Research Library & Saved Papers API ---
+
+@app.route('/api/papers', methods=['GET', 'POST'])
+@login_required
+def manage_papers():
+    if request.method == 'GET':
+        papers = Paper.query.filter_by(user_id=current_user.id).order_by(Paper.updated_at.desc()).all()
+        return jsonify({'success': True, 'papers': [p.to_dict() for p in papers]})
+
+    elif request.method == 'POST':
+        data = request.json or {}
+        paper_id = data.get('id')
+        title = data.get('title', '').strip() or "Untitled Research Draft"
+        topic = data.get('topic', '').strip()
+        language = data.get('language', 'English')
+        style = data.get('citation_style', 'APA')
+        content = data.get('content', '')
+        word_count = len(content.split()) if content else 0
+
+        if not content:
+            return jsonify({'success': False, 'message': 'Paper content is empty.'}), 400
+
+        if paper_id:
+            paper = Paper.query.filter_by(id=paper_id, user_id=current_user.id).first()
+            if paper:
+                paper.title = title
+                paper.topic = topic
+                paper.language = language
+                paper.citation_style = style
+                paper.content = content
+                paper.word_count = word_count
+                paper.updated_at = datetime.utcnow()
+                db.session.commit()
+                return jsonify({'success': True, 'paper': paper.to_dict(), 'message': 'Paper updated successfully!'})
+
+        # Create new
+        new_paper = Paper(
+            user_id=current_user.id,
+            title=title,
+            topic=topic,
+            language=language,
+            citation_style=style,
+            content=content,
+            word_count=word_count
+        )
+        db.session.add(new_paper)
+        db.session.commit()
+        return jsonify({'success': True, 'paper': new_paper.to_dict(), 'message': 'Paper saved to your Library!'})
+
+
+@app.route('/api/papers/<int:paper_id>', methods=['GET', 'DELETE'])
+@login_required
+def manage_single_paper(paper_id):
+    paper = Paper.query.filter_by(id=paper_id, user_id=current_user.id).first()
+    if not paper:
+        return jsonify({'success': False, 'message': 'Paper not found.'}), 404
+
+    if request.method == 'GET':
+        return jsonify({'success': True, 'paper': paper.to_dict()})
+
+    elif request.method == 'DELETE':
+        db.session.delete(paper)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Paper deleted from Library.'})
+
+
+@app.route('/api/citations', methods=['GET'])
+@login_required
+def get_citations():
+    citations = Citation.query.filter_by(user_id=current_user.id).order_by(Citation.created_at.desc()).all()
+    return jsonify({'success': True, 'citations': [c.to_dict() for c in citations]})
+
+
+@app.route('/api/citations/<int:citation_id>', methods=['DELETE'])
+@login_required
+def delete_citation(citation_id):
+    citation = Citation.query.filter_by(id=citation_id, user_id=current_user.id).first()
+    if not citation:
+        return jsonify({'success': False, 'message': 'Citation not found.'}), 404
+    db.session.delete(citation)
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Citation deleted.'})
+
+
+# --- Conversational AI Copilot ---
 
 @app.route('/chat', methods=['POST'])
 @login_required
 def chat():
-    # ... (code is unchanged)
-    if not gemini_model: return jsonify({"success": False, "message": "Gemini model not initialized."}), 500
+    if not gemini_model:
+        return jsonify({"success": False, "message": "Gemini model not initialized."}), 500
     try:
-        data = request.json
-        user_message, history = data.get('message'), data.get('history', [])
-        if not user_message: return jsonify({"success": False, "message": "Message cannot be empty."}), 400
+        data = request.json or {}
+        user_message = data.get('message', '').strip()
+        history = data.get('history', [])
+
+        if not user_message:
+            return jsonify({"success": False, "message": "Message cannot be empty."}), 400
+
         chat_session = gemini_model.start_chat(history=history)
         response = chat_session.send_message(user_message)
         return jsonify({"success": True, "reply": response.text})
     except Exception as e:
-        print(f"Chatbot API Error: {e}"); return jsonify({"success": False, "message": f"An error occurred: {str(e)}"}), 500
+        print(f"Chatbot API Error: {e}")
+        return jsonify({"success": False, "message": f"An error occurred: {str(e)}"}), 500
 
-if __name__ == '__main__':
+
+def init_database():
     with app.app_context():
         db.create_all()
-    app.run(debug=True, port=5000)
+        # Ensure schema compatibility for user table
+        try:
+            with db.engine.connect() as conn:
+                conn.execute(db.text("ALTER TABLE user ADD COLUMN created_at DATETIME"))
+                conn.commit()
+        except Exception:
+            pass # Column already exists
+
+init_database()
+
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5000))
+    app.run(debug=True, port=port)

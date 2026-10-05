@@ -1,101 +1,125 @@
-# 🎓 ScholarForge AI — Research Paper & Citation Engine
+# 🎓 ScholarForge AI 2.0 — Autonomous Academic Research Studio
 
 [![Python Version](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/framework-Flask%203.x-lightgrey.svg)](https://flask.palletsprojects.com/)
 [![AI Engine](https://img.shields.io/badge/model-Google%20Gemini%202.5--Flash-orange.svg)](https://aistudio.google.com/)
-[![Export Engine](https://img.shields.io/badge/compiler-Pandoc%20%7C%20XeLaTeX-green.svg)](https://pandoc.org/)
-[![Styling](https://img.shields.io/badge/UI-TailwindCSS%20%2B%20Sketch%20Neo--Brutalist-black.svg)](https://tailwindcss.com/)
+[![Scholarly Grounding](https://img.shields.io/badge/grounding-OpenAlex%20%2B%20CrossRef-indigo.svg)](https://openalex.org/)
+[![Export Engine](https://img.shields.io/badge/export-ReportLab%20%7C%20python--docx%20%7C%20Pandoc-green.svg)](https://pandoc.org/)
+[![Formulas](https://img.shields.io/badge/math-KaTeX%20LaTeX-yellow.svg)](https://katex.org/)
+[![Styling](https://img.shields.io/badge/UI-TailwindCSS%20%2B%20Neo--Brutalist-black.svg)](https://tailwindcss.com/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**ScholarForge AI** is a full-stack, AI-powered academic workspace designed to streamline the research, drafting, citation, and publication lifecycle. Built with Flask, Google Gemini, and Pandoc, ScholarForge enables researchers, university students, and technical writers to generate publication-grade research papers, format bibliographies across major citation standards (APA, MLA, Chicago, IEEE), and export documents directly to PDF, DOCX, Markdown, and TXT.
+**ScholarForge AI** is an advanced full-stack academic research workstation and autonomous manuscript studio. Engineered to eliminate citation hallucinations and streamline scientific writing, ScholarForge connects directly to scholarly knowledge graphs (**OpenAlex** and **CrossRef**) to ground AI synthesis in 250M+ peer-reviewed papers. It features real-time Server-Sent Events (SSE) streaming, native document compilation (PDF, DOCX, LaTeX, Markdown, TXT), an automated multi-style citation engine, and personal research library persistence.
 
 ---
 
-## 🌟 Key Features
+## 🌟 Key Capabilities
 
-- **📑 Intelligent Academic Paper Generation**
-  - Synthesizes structured, publication-grade academic papers from any research topic or thesis prompt.
-  - Automatically structures manuscripts with standard academic sections: *Title, Abstract, Keywords, Introduction, Literature Review, Methodology, Results & Discussion, Limitations, and Conclusion*.
-  - Multi-language support (English, Spanish, French, etc.).
+- **⚡ Real-Time SSE Manuscript Streaming**
+  - Generates publication-grade academic manuscripts with token-by-token live streaming.
+  - Automatically incorporates standard IMRaD sections: *Title, Abstract, Index Keywords, Introduction, Literature Review, Methodology, Results with LaTeX Math ($E=mc^2$), Discussion, Limitations, and References*.
+  - Live words counter, estimated reading time, and instant Markdown/KaTeX preview.
 
-- **📚 Automated Citation Engine**
-  - Formats raw source inputs (URLs, author strings, journal titles, DOIs) into clean, standard-compliant academic citations.
-  - Built-in support for **APA**, **MLA**, **Chicago**, and **IEEE** styles.
+- **🔍 Verified Literature Scout (OpenAlex & CrossRef)**
+  - Real-time search across 250M+ peer-reviewed scientific records.
+  - Returns verified DOIs, author rosters, publication years, citation counts, and direct Open Access PDF links.
+  - **One-Click Grounding**: Attach discovered papers directly to your manuscript prompt to enforce real, verified citations throughout your paper.
 
-- **🔍 Scholarly Bibliography Search**
-  - Generates comprehensive, curated bibliographies of foundational literature and research papers relevant to any query.
+- **🖨️ Zero-Failure Multi-Format Document Compilation**
+  - Native **PDF** export engineered with ReportLab (custom academic typography, running headers, and page counters).
+  - Native Microsoft **DOCX** generation via `python-docx`.
+  - Academic **LaTeX** source (`.tex`) with standard geometry, microtype, and amsmath packages.
+  - Raw **Markdown** (`.md`) and Plain Text (`.txt`).
+  - Seamless fallback support for Pandoc and XeLaTeX if installed on the host.
 
-- **🖨️ Multi-Format Document Compilation**
-  - Converts generated Markdown manuscripts into **PDF** (via Pandoc with XeLaTeX typography), Microsoft **DOCX**, raw **Markdown**, and **TXT**.
-  - Dynamic path resolution for cross-platform Pandoc execution (Windows, Linux, macOS).
+- **📑 Smart Citation & BibTeX Studio**
+  - Converts raw inputs, links, or DOIs into publication-compliant citations formatted in **APA 7th**, **MLA 9th**, **Chicago 17th**, **IEEE**, or **BibTeX**.
+  - One-click copy and automated archiving to your user library.
 
-- **💬 Embedded AI Research Assistant**
-  - Floating contextual chatbot for literature exploration, hypothesis refinement, and interactive writing prompts.
+- **📂 Persistent User Research Library**
+  - Relational SQLite/SQLAlchemy schema storing all generated manuscripts and citations per user.
+  - Load previous drafts back into the active studio canvas, export them in different formats, or delete old records.
 
-- **🎨 Modern Neo-Brutalist "Sketch" Interface**
-  - High-contrast, tactile monochrome aesthetic with smooth animations, live character counting, markdown preview toggle, and dark mode support.
-
-- **🔒 Built-in Authentication & Session Security**
-  - User registration, hashed credential storage with Werkzeug, and authenticated session management via Flask-Login.
+- **💬 Embedded AI Research Copilot**
+  - Floating conversational assistant to brainstorm hypotheses, refine methodological frameworks, and review abstracts.
 
 ---
 
-## 🏗️ Architecture & Tech Stack
+## 🏗️ System Architecture
 
 ```mermaid
-graph LR
-    User([User / Browser]) <--> UI[Tailwind + Neo-Brutalist UI]
-    UI <--> Flask[Flask Application / app.py]
-    Flask <--> Auth[Flask-Login + Werkzeug Security]
-    Flask <--> SQLite[(SQLite Database)]
-    Flask <--> Gemini[Google Gemini 2.5-Flash API]
-    Flask <--> Pandoc[Pandoc + XeLaTeX Document Compiler]
-    Pandoc --> Export[PDF / DOCX / MD / TXT Downloads]
+graph TD
+    User([Browser Client]) <--> UI[Tailwind CSS + Neo-Brutalist UI]
+    UI <--> SSE[SSE Streaming Reader / Fetch API]
+    
+    subgraph Flask Backend
+        Router[Flask App / app.py]
+        Auth[Flask-Login + Werkzeug Security]
+        Models[(SQLite DB: Users, Papers, Citations)]
+        
+        subgraph Academic Grounding Engine
+            OpenAlex[OpenAlex Graph API: 250M+ Works]
+            CrossRef[CrossRef Official DOI API]
+            PromptSynth[Grounded Prompt Synthesizer]
+        end
+        
+        subgraph Document Compiler
+            ReportLab[Native ReportLab PDF Engine]
+            Docx[Native python-docx Engine]
+            Pandoc[Pandoc + XeLaTeX Pipeline]
+        end
+    end
+    
+    SSE <--> Router
+    Router <--> Auth
+    Router <--> Models
+    Router <--> PromptSynth
+    PromptSynth <--> OpenAlex
+    PromptSynth <--> CrossRef
+    PromptSynth <--> Gemini[Google Gemini 2.5-Flash API]
+    Router <--> DocumentCompiler[Document Compiler]
+    DocumentCompiler --> ReportLab
+    DocumentCompiler --> Docx
+    DocumentCompiler --> Pandoc
 ```
-
-### Core Technologies
-- **Backend Framework**: Python 3.10+, [Flask 3.x](https://flask.palletsprojects.com/)
-- **Database & ORM**: SQLite, [Flask-SQLAlchemy](https://flask-sqlalchemy.palletsprojects.com/)
-- **Authentication**: [Flask-Login](https://flask-login.readthedocs.io/), [Werkzeug](https://palletsprojects.com/p/werkzeug/)
-- **Generative AI**: [Google Generative AI SDK](https://github.com/google-gemini/generative-ai-python) (`models/gemini-2.5-flash`)
-- **Document Pipeline**: [Pandoc](https://pandoc.org/), [pypandoc](https://pypi.org/project/pypandoc/)
-- **Frontend / Styling**: Vanilla JavaScript (ES6+), [Tailwind CSS](https://tailwindcss.com/), [Marked.js](https://marked.js.org/)
-- **Production Server**: [Gunicorn](https://gunicorn.org/) (Linux / Cloud)
 
 ---
 
-## 📁 Repository Structure
+## 📁 Project Directory Structure
 
 ```
 ScholarForge-AI/
-├── .env.example            # Environment variables template
-├── .gitignore              # Git ignore rules for virtual environments, secrets, and caches
-├── app.py                  # Main Flask application and API route definitions
-├── check_models.py         # Utility script to test Gemini API key and active models
-├── Procfile                # Gunicorn deployment configuration for Render/Heroku
-├── requirements.txt        # Python package dependencies
+├── .env.example            # Environment template (Gemini API key, secret keys)
+├── .gitignore              # Ignores .env, SQLite databases, temp files, and caches
+├── academic_engine.py      # OpenAlex & CrossRef scholarly retrieval & prompt grounding
+├── document_compiler.py    # Multi-format document exporter (PDF, DOCX, LaTeX, MD, TXT)
+├── app.py                  # Main Flask server, SSE streaming, authentication, and REST APIs
+├── check_models.py         # Diagnostic utility to verify Gemini API key and active models
+├── LICENSE                 # MIT Open-Source License
+├── Procfile                # Gunicorn cloud deployment configuration (Render/Heroku/Railway)
+├── requirements.txt        # Production Python dependencies
 ├── static/
-│   └── script.js           # Client-side UI interactions, tabs, API requests, and chat
+│   └── script.js           # Client-side SSE stream reader, library sync, tabs, and KaTeX
 ├── templates/
-│   ├── base.html           # Base HTML layout with typography, theme switcher, and navigation
-│   ├── index.html          # Main workspace dashboard (Paper Generator, Citation Engine, Chat)
-│   ├── login.html          # User authentication login view
-│   └── register.html       # New user onboarding view
+│   ├── base.html           # Layout with KaTeX, FontAwesome, and dark/light mode tokens
+│   ├── index.html          # Main academic studio (Manuscript Studio, Literature Scout, Library)
+│   ├── login.html          # User authentication view
+│   └── register.html       # New account onboarding view
 └── temp_files/
-    └── .gitkeep            # Directory for temporary document conversions
+    └── .gitkeep            # Ephemeral compilation storage
 ```
 
 ---
 
 ## 🚀 Quickstart Guide
 
-### 1. Clone the Repository
+### 1. Clone & Navigate
 ```bash
 git clone https://github.com/Lohith-RC/ScholarForge-AI.git
 cd ScholarForge-AI
 ```
 
-### 2. Set Up a Virtual Environment
+### 2. Activate Virtual Environment
 ```bash
 # Windows
 python -m venv .venv
@@ -111,84 +135,52 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4. Install Pandoc (Optional for PDF/DOCX Export)
-To enable document conversion to PDF and DOCX:
-- **Windows**: Install via [Chocolatey](https://chocolatey.org/): `choco install pandoc miktex` or download the installer from [Pandoc Releases](https://github.com/jgm/pandoc/releases).
-- **Ubuntu/Debian**:
-  ```bash
-  sudo apt-get update
-  sudo apt-get install pandoc texlive-xetex
-  ```
-- **macOS**:
-  ```bash
-  brew install pandoc basictex
-  ```
-
-### 5. Configure Environment Variables
+### 4. Configure Environment
 Copy `.env.example` to `.env`:
 ```bash
 cp .env.example .env
 ```
-Open `.env` and configure your credentials:
+Provide your Google Gemini API key:
 ```ini
-GEMINI_API_KEY=your_actual_gemini_api_key
-SECRET_KEY=your_secure_random_key
+GEMINI_API_KEY=your_actual_gemini_api_key_here
+SECRET_KEY=your_random_secret_key_here
+PORT=5000
 ```
-> 💡 *To get a free Gemini API key, visit [Google AI Studio](https://aistudio.google.com/).*
+> 💡 *Acquire a free API key at [Google AI Studio](https://aistudio.google.com/).*
 
-### 6. Verify Model Access (Optional)
-Run the diagnostic script to verify your API connection:
-```bash
-python check_models.py
-```
-
-### 7. Run the Application
+### 5. Launch the Application
 ```bash
 python app.py
 ```
-Open [http://127.0.0.1:5000](http://127.0.0.1:5000) in your web browser.
+Visit [http://127.0.0.1:5000](http://127.0.0.1:5000) in your browser.
 
 ---
 
-## 🌐 API Endpoints Reference
+## 🌐 API Reference
 
-| Endpoint | Method | Auth Required | Description |
+| Endpoint | Method | Auth | Description |
 | :--- | :---: | :---: | :--- |
-| `/register` | `GET`, `POST` | No | Register a new user account |
-| `/login` | `GET`, `POST` | No | Authenticate user and initiate session |
-| `/logout` | `GET` | Yes | Terminate current user session |
-| `/` | `GET` | Yes | Render the main research workstation interface |
-| `/generate` | `POST` | Yes | Generate structured research paper via Gemini 2.5-Flash |
-| `/download` | `POST` | Yes | Convert and compile Markdown to PDF, DOCX, TXT, or MD |
-| `/find-papers` | `POST` | Yes | Retrieve a formatted bibliography of related literature |
-| `/generate-citation` | `POST` | Yes | Format an individual citation in APA, MLA, Chicago, or IEEE |
-| `/chat` | `POST` | Yes | Contextual academic conversation with the AI assistant |
+| `/register` | `POST` | No | Creates a user account with hashed password |
+| `/login` | `POST` | No | Authenticates session cookie |
+| `/generate-stream` | `POST` | Yes | Real-time SSE streaming generation with literature grounding |
+| `/generate` | `POST` | Yes | Synchronous fallback paper generation |
+| `/find-papers` | `POST` | Yes | Retrieves verified scholarly papers from OpenAlex & CrossRef |
+| `/generate-citation` | `POST` | Yes | Formats citation into APA, MLA, Chicago, IEEE, or BibTeX |
+| `/download` | `POST` | Yes | Compiles and downloads PDF, DOCX, LaTeX, MD, or TXT |
+| `/api/papers` | `GET`, `POST` | Yes | Lists or saves manuscripts in user library |
+| `/api/papers/<id>` | `GET`, `DELETE` | Yes | Retrieves or removes an individual manuscript |
+| `/api/citations` | `GET` | Yes | Lists user's saved citations |
+| `/api/citations/<id>` | `DELETE` | Yes | Removes an individual citation |
+| `/chat` | `POST` | Yes | Contextual AI research copilot conversation |
 
 ---
 
-## ☁️ Deployment
+## ⚖️ Academic Integrity Statement
 
-The repository includes a `Procfile` ready for zero-configuration deployment on platforms like **Render**, **Railway**, or **Heroku**:
-
-```
-web: gunicorn app:app
-```
-
-Ensure the following environment variables are set in your cloud provider's dashboard:
-- `GEMINI_API_KEY`: Your Google AI Studio API key.
-- `SECRET_KEY`: A cryptographically secure random string.
-- `PYTHON_VERSION`: `3.10` or higher.
-
----
-
-## ⚖️ Academic Integrity & Disclaimer
-
-> **Important**: ScholarForge AI is designed as a **scaffolding and research acceleration tool**. It is intended to assist in brainstorming, organizing outlines, understanding methodologies, and formatting reference material. 
-> 
-> Users are strictly responsible for verifying citations, fact-checking assertions against primary literature, and adhering to their academic institution's policies regarding generative AI.
+ScholarForge AI is designed as a **scaffolding and research acceleration tool**. It assists authors in discovering literature, structuring outlines, analyzing frameworks, and formatting citations. Authors retain complete responsibility for reviewing citations, fact-checking claims, and complying with academic ethics policies.
 
 ---
 
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE) — feel free to use, modify, and build upon it.
+Licensed under the [MIT License](LICENSE).
