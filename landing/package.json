@@ -1,0 +1,25 @@
+{
+  "name": "rpg-hype-landing",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port=5173",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@react-three/fiber": "^9.0.0-rc.3",
+    "@react-three/postprocessing": "^3.0.4",
+    "lucide-react": "^1.16.0",
+    "postprocessing": "^6.36.7",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "three": "^0.174.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.14",
+    "@vitejs/plugin-react": "^4.3.4",
+    "tailwindcss": "^4.1.14",
+    "vite": "^6.2.3"
+  }
+}
