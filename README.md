@@ -3,14 +3,14 @@
 [![Python Version](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/framework-Flask%203.x-lightgrey.svg)](https://flask.palletsprojects.com/)
 [![AI Engine](https://img.shields.io/badge/model-Google%20Gemini%202.5--Flash-orange.svg)](https://aistudio.google.com/)
-[![Scholarly Grounding](https://img.shields.io/badge/grounding-OpenAlex%20%2B%20CrossRef-indigo.svg)](https://openalex.org/)
+[![Scholarly Grounding](https://img.shields.io/badge/grounding-OpenAlex%20%7C%20arXiv%20%7C%20Semantic%20Scholar-indigo.svg)](https://openalex.org/)
 [![Export Engine](https://img.shields.io/badge/export-ReportLab%20%7C%20python--docx%20%7C%20Pandoc-green.svg)](https://pandoc.org/)
 [![Formulas](https://img.shields.io/badge/math-KaTeX%20LaTeX-yellow.svg)](https://katex.org/)
 [![Styling](https://img.shields.io/badge/UI-TailwindCSS%20%2B%20Neo--Brutalist-black.svg)](https://tailwindcss.com/)
 [![Interactive 3D](https://img.shields.io/badge/landing-Three.js%20%7C%20WebGL%20Dither-cyan.svg)](templates/landing.html)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**ScholarForge AI** is an advanced full-stack academic research workstation and autonomous manuscript studio. Engineered to eliminate citation hallucinations and streamline scientific writing, ScholarForge connects directly to scholarly knowledge graphs (**OpenAlex** and **CrossRef**) to ground AI synthesis in 250M+ peer-reviewed papers. It features real-time Server-Sent Events (SSE) streaming, native document compilation (PDF, DOCX, LaTeX, Markdown, TXT), an automated multi-style citation engine, and personal research library persistence.
+**ScholarForge AI** is an advanced full-stack academic research workstation and autonomous manuscript studio. Engineered to eliminate citation hallucinations and streamline scientific writing, ScholarForge connects directly to scholarly knowledge graphs (**OpenAlex**, **arXiv**, **Semantic Scholar**, and **CrossRef**) to ground AI synthesis in 250M+ peer-reviewed papers. It features real-time Server-Sent Events (SSE) streaming, native document compilation (PDF, DOCX, LaTeX, Markdown, TXT), an automated multi-style citation engine with instant BibTeX generation, an interactive WebGL 3D preview suite, and personal research library persistence.
 
 ---
 
@@ -26,9 +26,10 @@
   - Dynamic runtime colorway customization with 4 bespoke frontier palettes (*Cyan Deep Space, Amber Terminal, Emerald Matrix, Monochrome Cyber*).
   - Frictionless portal bridging visitors directly into authenticated research workspaces (`/login` & `/app`).
 
-- **🔍 Verified Literature Scout (OpenAlex & CrossRef)**
-  - Real-time search across 250M+ peer-reviewed scientific records.
-  - Returns verified DOIs, author rosters, publication years, citation counts, and direct Open Access PDF links.
+- **🔍 Multi-Source Verified Literature Scout (OpenAlex, arXiv, Semantic Scholar, CrossRef)**
+  - Real-time federated search across 250M+ peer-reviewed scientific records and preprints.
+  - Automatic deduplication across repositories with verified DOIs, author rosters, publication years, citation counts, and direct Open Access PDF links.
+  - **Instant BibTeX Export**: One-click BibTeX generation with cite-keys for every discovered publication.
   - **One-Click Grounding**: Attach discovered papers directly to your manuscript prompt to enforce real, verified citations throughout your paper.
 
 - **🖨️ Zero-Failure Multi-Format Document Compilation**
@@ -180,7 +181,9 @@ Visit [http://127.0.0.1:5000](http://127.0.0.1:5000) in your browser.
 | `/logout` | `GET` | Yes | Terminates authenticated session |
 | `/generate-stream` | `POST` | Yes | Real-time SSE streaming generation with literature grounding |
 | `/generate` | `POST` | Yes | Synchronous fallback paper generation |
-| `/find-papers` | `POST` | Yes | Retrieves verified scholarly papers from OpenAlex & CrossRef |
+| `/find-papers` | `POST` | Yes | Federated search across OpenAlex, arXiv, Semantic Scholar & CrossRef |
+| `/api/public-scout` | `POST` | No | Public demo scout endpoint for live landing page testing |
+| `/api/waitlist` | `POST` | No | Early access / waitlist registry endpoint |
 | `/generate-citation` | `POST` | Yes | Formats citation into APA, MLA, Chicago, IEEE, or BibTeX |
 | `/download` | `POST` | Yes | Compiles and downloads PDF, DOCX, LaTeX, MD, or TXT |
 | `/api/papers` | `GET`, `POST` | Yes | Lists or saves manuscripts in user library |

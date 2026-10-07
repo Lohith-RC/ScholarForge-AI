@@ -90,6 +90,19 @@ class Citation(db.Model):
         }
 
 
+class Waitlist(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(255), unique=True, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "email": self.email,
+            "created_at": self.created_at.strftime("%Y-%m-%d %H:%M")
+        }
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
@@ -276,6 +289,8 @@ def find_papers():
             return jsonify({'success': False, 'message': 'Please enter a topic to find papers.'}), 400
 
         papers = academic_engine.search_verified_papers(topic, limit=6)
+        for p in papers:
+            p['bibtex'] = academic_engine.paper_to_bibtex(p)
         return jsonify({
             'success': True,
             'papers': papers,
@@ -284,6 +299,67 @@ def find_papers():
     except Exception as e:
         print(f"Scholarly Search Error: {e}")
         return jsonify({'success': False, 'message': f'Search failed: {str(e)}'}), 500
+
+
+# --- Public Landing Teaser & Waitlist Endpoints ---
+
+@app.route('/api/waitlist', methods=['POST'])
+def api_waitlist():
+    """
+    Early access / waitlist registry endpoint for ScholarForge AI.
+    Stores interested researchers and returns confirmation token.
+    """
+    data = request.json or {}
+    email = data.get('email', '').strip().lower()
+    if not email or '@' not in email or '.' not in email:
+        return jsonify({'success': False, 'message': 'Please enter a valid academic/researcher email address.'}), 400
+
+    existing = Waitlist.query.filter_by(email=email).first()
+    if existing:
+        return jsonify({
+            'success': True,
+            'message': 'Clearance acknowledged. Your researcher key is already active in the queue.',
+            'registered': True
+        })
+
+    try:
+        entry = Waitlist(email=email)
+        db.session.add(entry)
+        db.session.commit()
+        return jsonify({
+            'success': True,
+            'message': 'Key allocated. Access token registered in the neural queue.',
+            'registered': True
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': f'Registry failure: {str(e)}'}), 500
+
+
+@app.route('/api/public-scout', methods=['POST'])
+def api_public_scout():
+    """
+    Public preview literature scout for the 3D interactive landing experience.
+    Enables visitors to test live paper discovery across OpenAlex, arXiv, and CrossRef
+    without needing prior authentication.
+    """
+    data = request.json or {}
+    query = data.get('query', '').strip() or data.get('topic', '').strip()
+    if not query:
+        return jsonify({'success': False, 'message': 'Please provide a research keyword or topic to search.'}), 400
+
+    try:
+        papers = academic_engine.search_verified_papers(query, limit=4)
+        for p in papers:
+            p['bibtex'] = academic_engine.paper_to_bibtex(p)
+        return jsonify({
+            'success': True,
+            'papers': papers,
+            'count': len(papers),
+            'query': query
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Public scout failure: {str(e)}'}), 500
 
 
 # --- Citation Engine ---
